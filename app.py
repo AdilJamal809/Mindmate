@@ -3,7 +3,7 @@ import time
 import os
 
 # Replace this with os.getenv("GROQ_API_KEY") for deployment
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+GROQ_API_KEY = os.getenv("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")
 
 def safe_zone():
     st.markdown("### 🫂 You’re in a **Safe Zone**\nFeel free to share your thoughts. I’m here to listen without judgment.")
