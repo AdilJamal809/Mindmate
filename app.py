@@ -31,7 +31,7 @@ def get_crisis_response():
 "
         "**Please know you're not alone.** Here are some helpline numbers in India:
 "
-        "- ☎️ iCall: 9152987821
+        "- ☎️ iCall: 9152987821"
 "
         "- ☎️ AASRA: 91-22-27546669 / 91-22-27546667
 "
