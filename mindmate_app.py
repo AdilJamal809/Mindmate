@@ -1,82 +1,51 @@
+import os
 import streamlit as st
-import time
-import re
-import cv2
-import tempfile
-import base64
-import requests
-from PIL import Image
+from groq import Groq
 
-# Safe space message
-st.markdown("""
-    <h1 style='text-align: center;'>MindMate 🤝</h1>
-    <p style='text-align: center; font-size: 20px;'>You're in a safe space. Whatever you're feeling, it's okay. I'm here to support you.</p>
-""", unsafe_allow_html=True)
+# Set Streamlit page config
+st.set_page_config(page_title="MindMate", layout="centered")
 
-# Load Groq API Key
-try:
-    api_key = st.secrets["GROQ_API_KEY"]
-except:
-    st.error("Missing GROQ_API_KEY in Streamlit secrets.")
+# Retrieve the GROQ API key from environment variables
+api_key = os.getenv("GROQ_API_KEY")
+
+if not api_key:
+    st.error("❌ Missing GROQ_API_KEY in environment variables.")
     st.stop()
 
-# Suicide keyword detection and helpline response
-def check_for_emergency(text):
-    crisis_keywords = ["suicide", "kill myself", "end my life", "depressed"]
-    if any(re.search(rf"\\b{k}\\b", text, re.IGNORECASE) for k in crisis_keywords):
-        st.error("⚠️ It sounds like you're going through something really tough. You're not alone.")
-        st.info("📞 India Helpline: 9152987821 (iCall), 022-27546669 (AASRA), or 91-9820466726")
-        st.success("Take a deep breath. You matter and you're cared for. ❤️")
-        return True
-    return False
+# Initialize Groq client
+client = Groq(api_key=api_key)
 
-# Breathing exercise
-with st.expander("🧘 Breathing Exercise"):
-    inhale_time = st.slider("Inhale time (seconds)", 2, 10, 4)
-    hold_time = st.slider("Hold time (seconds)", 2, 10, 4)
-    exhale_time = st.slider("Exhale time (seconds)", 2, 10, 4)
-    if st.button("Start Breathing Exercise"):
-        for i in range(3):
-            st.write("**Inhale**")
-            time.sleep(inhale_time)
-            st.write("**Hold**")
-            time.sleep(hold_time)
-            st.write("**Exhale**")
-            time.sleep(exhale_time)
-        st.success("Done! Hope you're feeling calmer now.")
+# UI Elements
+st.title("🧠 MindMate")
+st.subheader("AI Mental Health Companion")
+st.markdown("Chat privately with an AI about your thoughts or feelings.")
 
-# Webcam analysis (placeholder)
-with st.expander("📷 Analyze Mental Health via Webcam"):
-    st.info("Note: This is a placeholder. Camera mood analysis requires ML models.")
-    run_webcam = st.checkbox("Run Webcam")
-    if run_webcam:
-        cap = cv2.VideoCapture(0)
-        stframe = st.empty()
-        while run_webcam:
-            ret, frame = cap.read()
-            if not ret:
-                break
-            stframe.image(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
-            if st.button("Stop Webcam"):
-                break
-        cap.release()
+# Chat interface
+if "messages" not in st.session_state:
+    st.session_state.messages = []
 
-# Main chatbot interaction
-st.markdown("---")
-user_input = st.text_area("🗣️ Talk to MindMate")
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
 
-if user_input:
-    if not check_for_emergency(user_input):
-        # Send to Groq API
-        headers = {"Authorization": f"Bearer {api_key}"}
-        payload = {
-            "model": "llama3-70b-8192",
-            "messages": [{"role": "user", "content": user_input}]
-        }
-        try:
-            response = requests.post("https://api.groq.com/openai/v1/chat/completions",
-                                     headers=headers, json=payload)
-            ai_reply = response.json()["choices"][0]["message"]["content"]
-            st.write(f"**MindMate:** {ai_reply}")
-        except Exception as e:
-            st.error(f"Error from Groq API: {e}")
+# Handle user prompt
+if prompt := st.chat_input("How are you feeling today?"):
+    st.chat_message("user").markdown(prompt)
+    st.session_state.messages.append({"role": "user", "content": prompt})
+
+    # Send to Groq
+    try:
+        chat_completion = client.chat.completions.create(
+            model="llama3-8b-8192",
+            messages=[
+                {"role": m["role"], "content": m["content"]}
+                for m in st.session_state.messages
+            ],
+        )
+
+        reply = chat_completion.choices[0].message.content
+        st.chat_message("assistant").markdown(reply)
+        st.session_state.messages.append({"role": "assistant", "content": reply})
+
+    except Exception as e:
+        st.error(f"❌ Failed to get response: {e}")
