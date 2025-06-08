@@ -25,21 +25,16 @@ def detect_crisis(text):
     return any(word in text.lower() for word in SUICIDE_KEYWORDS)
 
 def get_crisis_response():
-    return (
-       '''⚠️ It sounds like you're going through a tough time.'''
+    return """
+⚠️ It sounds like you're going through a tough time.
 
-"
-        "**Please know you're not alone.** Here are some helpline numbers in India:
-"
-        "- ☎️ iCall: 9152987821
-"
-        "- ☎️ AASRA: 91-22-27546669 / 91-22-27546667
-"
-        "- ☎️ Vandrevala Foundation: 1860 266 2345 or 1800 233 3330
+**Please know you're not alone.** Here are some helpline numbers in India:
+- ☎️ iCall: 9152987821
+- ☎️ AASRA: 91-22-27546669 / 91-22-27546667
+- ☎️ Vandrevala Foundation: 1860 266 2345 or 1800 233 3330
 
-"
-        "_You're valuable and help is available. ❤️_"
-    )
+_You're valuable and help is available. ❤️_
+"""
 
 def ai_response(prompt):
     try:
