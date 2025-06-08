@@ -26,7 +26,7 @@ def detect_crisis(text):
 
 def get_crisis_response():
     return (
-        "⚠️ It sounds like you're going through a tough time.
+        "⚠️ It sounds like you're going through a tough time."
 
 "
         "**Please know you're not alone.** Here are some helpline numbers in India:
