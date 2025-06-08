@@ -2,8 +2,8 @@ import streamlit as st
 import time
 import os
 
-groq_api_key = os.getenv("GROQ_API_KEY")
-
+# Use the Groq API key securely from environment variable
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
 def safe_zone():
     st.markdown("### 🫂 You’re in a **Safe Zone**\nFeel free to share your thoughts. I’m here to listen without judgment.")
