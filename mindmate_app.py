@@ -1,83 +1,74 @@
 import streamlit as st
-import os
-from groq import Groq
 import time
+import cv2
+import numpy as np
+from groq import Groq
+import os
 
-# Set up Groq API client
-client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+st.set_page_config(page_title="MindMate Mental Health Chatbot", layout="centered")
 
-# Set page config
-st.set_page_config(page_title="MindMate Mental Health Chatbot", page_icon="🧠", layout="centered")
+# Set your Groq API key from environment variable
+groq_api_key = os.getenv("GROQ_API_KEY")
+client = Groq(api_key=groq_api_key)
 
-# Custom CSS for UI styling
+# Safe zone welcome message
 st.markdown("""
-    <style>
-        html, body {
-            background-color: #f2f6fa;
-            font-family: 'Segoe UI', sans-serif;
-        }
-        .title {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: #2b4c7e;
-        }
-        .safe-zone {
-            font-size: 1.2rem;
-            background-color: #eaf6ff;
-            border-radius: 10px;
-            padding: 1rem;
-            color: #22577a;
-            margin-top: 10px;
-            margin-bottom: 20px;
-        }
-        .stButton>button {
-            background-color: #4d7cfe;
-            color: white;
-            font-weight: bold;
-            padding: 0.5rem 1.5rem;
-            border-radius: 10px;
-        }
-        input, textarea {
-            font-size: 1rem;
-        }
-    </style>
-""", unsafe_allow_html=True)
+# 🧠 MindMate Mental Health Chatbot (Groq API)
 
-# Title and safety message
-st.markdown('<div class="title">🧠 MindMate Mental Health Chatbot</div>', unsafe_allow_html=True)
-st.markdown('<div class="safe-zone">💬 You are in a safe zone. <br>Feel free to share anything you’re feeling. I’m here to help.</div>', unsafe_allow_html=True)
+## 🧠 You are in a safe zone.
+Feel free to share anything you're feeling. I'm here to help.
+""")
 
-# Chat input
-st.markdown("### How are you feeling today?")
-user_input = st.text_input("")
+# Text input
+st.subheader("How are you feeling today?")
+user_input = st.text_input("", placeholder="Type here and press Enter…")
 
-# Show bot response
-if st.button("Send"):
-    try:
-        with st.spinner("MindMate is thinking..."):
+# Check for crisis keywords
+def contains_crisis_words(text):
+    text = text.lower()
+    crisis_words = ["suicide", "kill myself", "self-harm", "depressed", "want to die", "hurting myself"]
+    return any(word in text for word in crisis_words)
+
+if user_input:
+    if contains_crisis_words(user_input):
+        st.markdown("""
+### 🆘 It looks like you're going through something very difficult.
+You're not alone. Please consider reaching out to a mental health professional or calling these Indian helpline numbers:
+
+📞 **iCall** – 9152987821  
+📞 **AASRA** – 91-9820466726  
+📞 **Vandrevala Foundation Helpline** – 1860 266 2345 / 1800 233 3330  
+
+💙 You are valued. You are important. You deserve support.
+        """)
+    else:
+        try:
             response = client.chat.completions.create(
-                model="llama3-70b-8192",
-                messages=[
-                    {"role": "system", "content": "You are a compassionate AI trained to help users with mental wellness. Be supportive and thoughtful."},
-                    {"role": "user", "content": user_input}
-                ]
+                model="llama3-8b-8192",
+                messages=[{"role": "user", "content": user_input}],
+                temperature=0.7
             )
-            st.success("MindMate:")
-            st.write(response.choices[0].message.content)
-    except Exception as e:
-        st.error(f"MindMate: Error: {str(e)}")
+            st.markdown("**MindMate:** " + response.choices[0].message.content)
+        except Exception as error:
+            st.error(f"MindMate: Error: {error}")
 
-# Breathing exercise
-if st.button("🧘 Start Breathing Exercise"):
-    st.markdown("### Let's begin a calming breathing exercise")
-    phases = [("Inhale", 4), ("Hold", 4), ("Exhale", 4), ("Hold", 4)]
-    for i in range(3):  # 3 cycles
-        for action, duration in phases:
-            st.markdown(f"#### {action} for {duration} seconds")
-            time.sleep(duration)
-            st.experimental_rerun()
+# Breathing Exercise
+if st.button("Start Breathing Exercise"):
+    st.markdown("## 🌬️ Breathing Exercise")
+    for _ in range(3):
+        st.markdown("### Inhale")
+        time.sleep(4)
+        st.markdown("### Hold")
+        time.sleep(4)
+        st.markdown("### Exhale")
+        time.sleep(4)
+    st.success("Hope that helped you feel a little better 💙")
 
-# Webcam placeholder
-if st.button("📷 Analyze via Webcam"):
-    st.warning("Webcam mental health analysis not available in this deployment. Try local app for full features.")
+# Webcam-based mood analysis (mock)
+def analyze_face_emotion():
+    st.markdown("## 📷 Analyzing Emotion via Webcam")
+    st.info("(Simulated Webcam Analysis: This part needs a real emotion recognition model.)")
+    st.success("You seem calm. Keep taking care of yourself 💙")
 
+if st.button("Analyze via Webcam"):
+    analyze_face_emotion()
