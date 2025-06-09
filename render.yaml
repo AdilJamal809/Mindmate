@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: mindmate-chatbot
+    runtime: python
+    region: oregon
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: streamlit run mindmate_app.py --server.port $PORT
+    envVars:
+      - key: GROQ_API_KEY
+        value: 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
