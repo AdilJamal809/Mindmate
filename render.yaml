@@ -3,7 +3,7 @@ services:
     name: mindmate
     runtime: python
     buildCommand: pip install -r requirements.txt
-    startCommand: streamlit run mindmate_app_groq.py
+    startCommand: streamlit run mindmate_app.py
     envVars:
       - key: GROQ_API_KEY
         sync: false
