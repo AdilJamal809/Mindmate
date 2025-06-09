@@ -1,7 +1,0 @@
-
-services:
-  - type: web
-    name: mindmate
-    env: python
-    buildCommand: "pip install -r requirements.txt"
-    startCommand: "streamlit run mindmate_app.py"
