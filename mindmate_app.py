@@ -54,7 +54,7 @@ def show_support_message():
 def get_groq_response(prompt):
     try:
         response = client.chat.completions.create(
-            model="mixtral-8x7b-32768",
+            model = "gemma-7b-it",
             messages=[
                 {"role": "system", "content": "You are a kind and supportive mental health assistant named MindMate."},
                 {"role": "user", "content": prompt}
