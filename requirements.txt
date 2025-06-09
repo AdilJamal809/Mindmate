@@ -1,4 +1,0 @@
-
-streamlit
-groq
-opencv-python
